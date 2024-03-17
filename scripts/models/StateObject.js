@@ -92,12 +92,8 @@ export default class StateObject {
         }
     }
 
-    changeDirection(direction, player = false) {
+    changeDirection(direction) {
         this._direction = direction;
-        if (player) {
-            this._directionMap[direction] = true;
-            return;
-        }
         for (let key of Object.keys(this._directionMap)) {
             if (key === direction) {
                 this._directionMap[key] = true;

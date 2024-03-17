@@ -15,12 +15,17 @@ export default class PlayerObject extends StateObject {
         this.lastDirection = this._direction;
     }
 
+    isKeyDown(direction = '') {
+        return Boolean(this._directionMap[direction]);
+    }
+
     getKeyMapValue(key = '') {
         return this._keyMap[key];
     }
 
     keyDown(keyCode = '') {
         let direction = this.getKeyMapValue(keyCode);
+        // don't remove this or it fucks the player movement
         if (this._direction && this._direction != direction) {
             this._lastDirection = this._direction;
         }
@@ -43,10 +48,6 @@ export default class PlayerObject extends StateObject {
         }
     }
 
-    isKeyDown(direction = '') {
-        return Boolean(this._directionMap[direction]);
-    }
-
     detectCollision(objects) {
         let positionList = Util.buildXYList(objects, this._id);
         for (let position of positionList) {
@@ -60,5 +61,12 @@ export default class PlayerObject extends StateObject {
                 this._colliding.collision = false;
             }
         };
+    }
+
+    changeDirection(direction, val = false) {
+        this._direction = direction;
+        if (Object.keys(this._directionMap).includes(direction)) {
+            this._directionMap[direction] = val;
+        }
     }
 }
