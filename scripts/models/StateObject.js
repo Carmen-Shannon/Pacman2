@@ -1,20 +1,31 @@
 import MathUtil from "../util/MathUtil.js";
+import Util from "../util/Util.js";
 
 export default class StateObject {
+    _id;
     _x;
     _y;
     _width;
     _height;
     _speed;
     _fillColor;
+    _baseFillColor;
+    _direction;
+    _colliding = {
+        collisionDirection: '',
+        collision: false,
+    };
 
     constructor(x = 0, y = 0, width = 0, height = 0, speed = 0, fillColor = 'black') {
+        this._id = crypto.randomUUID();
         this._x = x;
         this._y = y;
         this._width = width;
         this._height = height;
         this._speed = speed;
         this._fillColor = fillColor;
+        this._baseFillColor = this._fillColor;
+        this._direction = '';
     }
 
     moveLinear(direction, timePassed, duration) {
@@ -56,6 +67,7 @@ export default class StateObject {
     }
 
     move(direction, secondsPassed) {
+        this._direction = direction;
         switch(direction) {
             case 'up':
                 this._y -= this._speed * secondsPassed;
@@ -74,8 +86,23 @@ export default class StateObject {
         }
     }
 
+    detectCollision(objects) {
+        let positionList = Util.buildXYList(objects, this._id);
+        for (let position of positionList) {
+            const collision = Util.isColliding(this, position);
+            if (collision[0]) {
+                this._fillColor = 'red';
+                this._colliding.collision = true;
+                this._colliding.collisionDirection = collision[1];
+            } else {
+                this._fillColor = this._baseFillColor;
+                this._colliding.collision = false;
+                this._colliding.collisionDirection = '';
+            }
+        };
+    }
+
     draw(ctx) {
-        // const randomColor = Math.random() > 0.5 ? '#ff8080' : '#0099b0';
         ctx.fillStyle = this._fillColor;
         ctx.fillRect(this._x, this._y, this._width, this._height);
     }
@@ -93,6 +120,14 @@ export default class StateObject {
         if (direction === 'down') {
             this.move('down', secondsPassed);
         }
+    }
+
+    get direction() {
+        return this._direction;
+    }
+
+    get id() {
+        return this._id;
     }
 
     get x() {
@@ -119,6 +154,10 @@ export default class StateObject {
         return this._fillColor;
     }
 
+    set id(id) {
+        this._id = id;
+    }
+
     set x(x) {
         this._x = x;
     }
@@ -141,5 +180,9 @@ export default class StateObject {
 
     set fillColor(fillColor) {
         this._fillColor = fillColor;
+    }
+
+    set direction(direction) {
+        this._direction = direction;
     }
 }

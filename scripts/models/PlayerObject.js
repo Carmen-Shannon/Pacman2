@@ -1,4 +1,5 @@
 import StateObject from "./StateObject.js";
+import Util from "../util/Util.js";
 
 export default class PlayerObject extends StateObject {
     _keyMap = {
@@ -16,7 +17,7 @@ export default class PlayerObject extends StateObject {
     }
 
     constructor(width = 0, height = 0, speed = 0) {
-        super(0, 0, width, height, speed);
+        super(0, 0, width, height, speed, 'yellow');
     }
 
     isKeyPressed(key = '') {
@@ -41,18 +42,39 @@ export default class PlayerObject extends StateObject {
         this.updatePressedKey(key, false);
     }
 
+    stopMovement(direction) {
+        if (this._pressedKeys[direction]) {
+            this._pressedKeys[direction] = false;
+        }
+    }
+
     update(secondsPassed) {
-        if (this.isKeyPressed('left')) {
-            this.move('left', secondsPassed);
-        }
-        if (this.isKeyPressed('right')) {
-            this.move('right', secondsPassed);
-        }
-        if (this.isKeyPressed('up')) {
-            this.move('up', secondsPassed);
-        }
-        if (this.isKeyPressed('down')) {
-            this.move('down', secondsPassed);
+        if (!this._colliding.collision) {
+            if (this.isKeyPressed('left')) {
+                this.move('left', secondsPassed);
+            }
+            if (this.isKeyPressed('right')) {
+                this.move('right', secondsPassed);
+            }
+            if (this.isKeyPressed('up')) {
+                this.move('up', secondsPassed);
+            }
+            if (this.isKeyPressed('down')) {
+                this.move('down', secondsPassed);
+            }
+        } else {
+            if (this.isKeyPressed('left')) {
+                this.direction = 'left';
+            }
+            if (this.isKeyPressed('right')) {
+                this.direction = 'right';
+            }
+            if (this.isKeyPressed('up')) {
+                this.direction = 'up';
+            }
+            if (this.isKeyPressed('down')) {
+                this.direction = 'down';
+            }
         }
     }
 }
