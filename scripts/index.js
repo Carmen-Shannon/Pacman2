@@ -47,7 +47,7 @@ const init = () => {
 const update = (secondsPassed) => {
     fpsDisplay.update(secondsPassed);
     for (let ghost of ghosts) {
-        ghost.update(ghost.direction, secondsPassed);
+        ghost.update(secondsPassed);
         ghost.detectCollision([player]);
     }
     player.update(secondsPassed);

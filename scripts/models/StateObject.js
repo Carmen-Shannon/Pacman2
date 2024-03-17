@@ -15,6 +15,12 @@ export default class StateObject {
         collisionDirection: '',
         collision: false,
     };
+    _directionMap = {
+        'left': false,
+        'right': false,
+        'up': false,
+        'down': false
+    }
 
     constructor(x = 0, y = 0, width = 0, height = 0, speed = 0, fillColor = 'black') {
         this._id = crypto.randomUUID();
@@ -86,6 +92,21 @@ export default class StateObject {
         }
     }
 
+    changeDirection(direction, player = false) {
+        this._direction = direction;
+        if (player) {
+            this._directionMap[direction] = true;
+            return;
+        }
+        for (let key of Object.keys(this._directionMap)) {
+            if (key === direction) {
+                this._directionMap[key] = true;
+            } else {
+                this._directionMap[key] = false;
+            }
+        }
+    }
+
     detectCollision(objects) {
         let positionList = Util.buildXYList(objects, this._id);
         for (let position of positionList) {
@@ -97,7 +118,6 @@ export default class StateObject {
             } else {
                 this._fillColor = this._baseFillColor;
                 this._colliding.collision = false;
-                this._colliding.collisionDirection = '';
             }
         };
     }
@@ -107,17 +127,17 @@ export default class StateObject {
         ctx.fillRect(this._x, this._y, this._width, this._height);
     }
 
-    update(direction, secondsPassed) {
-        if (direction === 'left') {
+    update(secondsPassed) {
+        if (this._direction === 'left') {
             this.move('left', secondsPassed);
         }
-        if (direction === 'right') {
+        if (this._direction === 'right') {
             this.move('right', secondsPassed);
         }
-        if (direction === 'up') {
+        if (this._direction === 'up') {
             this.move('up', secondsPassed);
         }
-        if (direction === 'down') {
+        if (this._direction === 'down') {
             this.move('down', secondsPassed);
         }
     }

@@ -2,79 +2,63 @@ import StateObject from "./StateObject.js";
 import Util from "../util/Util.js";
 
 export default class PlayerObject extends StateObject {
+    _lastDirection;
     _keyMap = {
         68: 'right',
         65: 'left',
         87: 'up',
-        83: 'down'
-    }
-
-    _pressedKeys = {
-        left: false,
-        right: false,
-        up: false,
-        down: false
+        83: 'down',
     }
 
     constructor(width = 0, height = 0, speed = 0) {
         super(0, 0, width, height, speed, 'yellow');
-    }
-
-    isKeyPressed(key = '') {
-        return this._pressedKeys[key];
-    }
-
-    updatePressedKey(key = '', val = false) {
-        this._pressedKeys[key] = val;
+        this.lastDirection = this._direction;
     }
 
     getKeyMapValue(key = '') {
         return this._keyMap[key];
     }
 
-    keyDown(keyCode) {
-        let key = this.getKeyMapValue(keyCode);
-        this.updatePressedKey(key, true);
+    keyDown(keyCode = '') {
+        let direction = this.getKeyMapValue(keyCode);
+        if (this._direction && this._direction != direction) {
+            this._lastDirection = this._direction;
+        }
+        this.changeDirection(direction, true);
     }
 
-    keyUp(keyCode) {
-        let key = this.getKeyMapValue(keyCode);
-        this.updatePressedKey(key, false);
+    keyUp(keyCode = '') {
+        let direction = this.getKeyMapValue(keyCode);
+        this.stopMovement(direction);
     }
 
-    stopMovement(direction) {
-        if (this._pressedKeys[direction]) {
-            this._pressedKeys[direction] = false;
+    stopMovement(direction = '') {
+        this._directionMap[direction] = false;
+        if (this.isKeyDown(this._lastDirection)) {
+            this.changeDirection(this._lastDirection, true);
+            this._lastDirection = direction;
+        } else if (!this.isKeyDown(this._direction)) {
+            this.changeDirection('', true);
+            this._lastDirection = direction;
         }
     }
 
-    update(secondsPassed) {
-        if (!this._colliding.collision) {
-            if (this.isKeyPressed('left')) {
-                this.move('left', secondsPassed);
+    isKeyDown(direction = '') {
+        return Boolean(this._directionMap[direction]);
+    }
+
+    detectCollision(objects) {
+        let positionList = Util.buildXYList(objects, this._id);
+        for (let position of positionList) {
+            const collision = Util.isColliding(this, position);
+            if (collision[0]) {
+                this._fillColor = 'red';
+                this._colliding.collision = true;
+                this._colliding.collisionDirection = collision[1];
+            } else {
+                this._fillColor = this._baseFillColor;
+                this._colliding.collision = false;
             }
-            if (this.isKeyPressed('right')) {
-                this.move('right', secondsPassed);
-            }
-            if (this.isKeyPressed('up')) {
-                this.move('up', secondsPassed);
-            }
-            if (this.isKeyPressed('down')) {
-                this.move('down', secondsPassed);
-            }
-        } else {
-            if (this.isKeyPressed('left')) {
-                this.direction = 'left';
-            }
-            if (this.isKeyPressed('right')) {
-                this.direction = 'right';
-            }
-            if (this.isKeyPressed('up')) {
-                this.direction = 'up';
-            }
-            if (this.isKeyPressed('down')) {
-                this.direction = 'down';
-            }
-        }
+        };
     }
 }
