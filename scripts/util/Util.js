@@ -19,4 +19,17 @@ export default class Util {
         }
         return [true, object1.direction, object2.direction];
     }
+
+    static getOppositeDirection(direction) {
+        switch(direction) {
+            case 'up':
+                return 'down';
+            case 'down':
+                return 'up';
+            case 'left':
+                return 'right';
+            case 'right':
+                return 'left';
+        }
+    }
 }

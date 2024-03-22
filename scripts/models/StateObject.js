@@ -76,6 +76,7 @@ export default class StateObject {
         this._direction = direction;
         switch(direction) {
             case 'up':
+                if (this._colliding.collisionDirection != direction)
                 this._y -= this._speed * secondsPassed;
                 break;
             case 'down':
@@ -110,10 +111,15 @@ export default class StateObject {
             if (collision[0]) {
                 this._fillColor = 'red';
                 this._colliding.collision = true;
-                this._colliding.collisionDirection = collision[1];
+                if (collision[2]) {
+                    this._colliding.collisionDirection = Util.getOppositeDirection(collision[2]);
+                } else {
+                    this._colliding.collisionDirection = this._direction;
+                }
             } else {
                 this._fillColor = this._baseFillColor;
                 this._colliding.collision = false;
+                this._colliding.collisionDirection = '';
             }
         };
     }
@@ -123,17 +129,18 @@ export default class StateObject {
         ctx.fillRect(this._x, this._y, this._width, this._height);
     }
 
-    update(secondsPassed) {
-        if (this._direction === 'left') {
+    update(secondsPassed, collisionObjects) {
+        this.detectCollision(collisionObjects);
+        if (this._direction === 'left' && this._colliding.collisionDirection != 'left') {
             this.move('left', secondsPassed);
         }
-        if (this._direction === 'right') {
+        if (this._direction === 'right' && this._colliding.collisionDirection != 'right') {
             this.move('right', secondsPassed);
         }
-        if (this._direction === 'up') {
+        if (this._direction === 'up' && this._colliding.collisionDirection != 'up') {
             this.move('up', secondsPassed);
         }
-        if (this._direction === 'down') {
+        if (this._direction === 'down' && this._colliding.collisionDirection != 'down') {
             this.move('down', secondsPassed);
         }
     }

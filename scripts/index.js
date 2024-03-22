@@ -47,11 +47,9 @@ const init = () => {
 const update = (secondsPassed) => {
     fpsDisplay.update(secondsPassed);
     for (let ghost of ghosts) {
-        ghost.update(secondsPassed);
-        ghost.detectCollision([player]);
+        ghost.update(secondsPassed, [player]);
     }
-    player.update(secondsPassed);
-    player.detectCollision(ghosts);
+    player.update(secondsPassed, ghosts);
 }
 
 const draw = (ctx) => {

@@ -25,11 +25,10 @@ export default class PlayerObject extends StateObject {
 
     keyDown(keyCode = '') {
         let direction = this.getKeyMapValue(keyCode);
-        // don't remove this or it fucks the player movement
-        if (this._direction && this._direction != direction) {
+        if (this._colliding.collisionDirection != direction) {
             this._lastDirection = this._direction;
+            this.changeDirection(direction, true);
         }
-        this.changeDirection(direction, true);
     }
 
     keyUp(keyCode = '') {
@@ -44,24 +43,27 @@ export default class PlayerObject extends StateObject {
             this._lastDirection = direction;
         } else if (!this.isKeyDown(this._direction)) {
             this.changeDirection('', true);
-            this._lastDirection = direction;
+            this.lastDirection = direction;
+        } else {
+            this._lastDirection = this._direction;
         }
     }
 
-    detectCollision(objects) {
-        let positionList = Util.buildXYList(objects, this._id);
-        for (let position of positionList) {
-            const collision = Util.isColliding(this, position);
-            if (collision[0]) {
-                this._fillColor = 'red';
-                this._colliding.collision = true;
-                this._colliding.collisionDirection = collision[1];
-            } else {
-                this._fillColor = this._baseFillColor;
-                this._colliding.collision = false;
-            }
-        };
-    }
+    // detectCollision(objects) {
+    //     let positionList = Util.buildXYList(objects, this._id);
+    //     for (let position of positionList) {
+    //         const collision = Util.isColliding(this, position);
+    //         if (collision[0]) {
+    //             this._fillColor = 'red';
+    //             this._colliding.collision = true;
+    //             this._colliding.collisionDirection = collision[1];
+    //             this.stopMovement(collision[1]);
+    //         } else {
+    //             this._fillColor = this._baseFillColor;
+    //             this._colliding.collision = false;
+    //         }
+    //     };
+    // }
 
     changeDirection(direction, val = false) {
         this._direction = direction;
