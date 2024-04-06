@@ -1,30 +1,35 @@
 export default class CanvasConfig {
-    _canvas;
-    _ctx;
+    #canvas;
+    #ctx;
+
+    constructor() {
+        this.#canvas = document.getElementById('gamewindow');
+        this.#ctx = this.#canvas.getContext('2d');
+    }
 
     init(canvas = undefined, ctx = undefined) {
-        this._canvas = canvas;
-        this._ctx = ctx;
+        this.#canvas = canvas;
+        this.#ctx = ctx;
     }
 
     clearCtx() {
-        this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+        this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
     }
 
     get canvas() {
-        return this._canvas;
+        return this.#canvas;
     }
 
     get ctx() {
-        return this._ctx;
+        return this.#ctx;
     }
 
     set canvas(canvas) {
-        this._canvas = canvas;
+        this.#canvas = canvas;
     }
 
     set ctx(ctx) {
-        this._ctx = ctx;
+        this.#ctx = ctx;
     }
 
 }

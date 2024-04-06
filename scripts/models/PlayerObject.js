@@ -1,9 +1,8 @@
 import StateObject from "./StateObject.js";
-import Util from "../util/Util.js";
 
 export default class PlayerObject extends StateObject {
-    _lastDirection;
-    _keyMap = {
+    #movementQueue;
+    #keyMap = {
         68: 'right',
         65: 'left',
         87: 'up',
@@ -12,63 +11,63 @@ export default class PlayerObject extends StateObject {
 
     constructor(width = 0, height = 0, speed = 0) {
         super(0, 0, width, height, speed, 'yellow');
-        this.lastDirection = this._direction;
+        this.#movementQueue = [];
     }
 
     isKeyDown(direction = '') {
-        return Boolean(this._directionMap[direction]);
+        return Boolean(this.directionMap[direction]);
     }
 
     getKeyMapValue(key = '') {
-        return this._keyMap[key];
+        return this.#keyMap[key];
     }
 
     keyDown(keyCode = '') {
         let direction = this.getKeyMapValue(keyCode);
-        if (this._colliding.collisionDirection != direction) {
-            this._lastDirection = this._direction;
-            this.changeDirection(direction, true);
+        if (this.colliding.collisionDirection != direction) {
+            this.#addMovement(direction);
+            this.changeDirection(direction, false);
         }
     }
 
     keyUp(keyCode = '') {
         let direction = this.getKeyMapValue(keyCode);
-        this.stopMovement(direction);
+        this.#stopMovement(direction);
     }
 
-    stopMovement(direction = '') {
-        this._directionMap[direction] = false;
-        if (this.isKeyDown(this._lastDirection)) {
-            this.changeDirection(this._lastDirection, true);
-            this._lastDirection = direction;
-        } else if (!this.isKeyDown(this._direction)) {
-            this.changeDirection('', true);
-            this.lastDirection = direction;
+    #stopMovement(direction = '') {
+        this.clearDirection(direction);
+        this.#removeMovement(direction);
+        if (this.#shouldMove()) {
+            this.changeDirection(this.#movementQueue[0], false);
         } else {
-            this._lastDirection = this._direction;
+            this.changeDirection('', false);
         }
     }
 
-    // detectCollision(objects) {
-    //     let positionList = Util.buildXYList(objects, this._id);
-    //     for (let position of positionList) {
-    //         const collision = Util.isColliding(this, position);
-    //         if (collision[0]) {
-    //             this._fillColor = 'red';
-    //             this._colliding.collision = true;
-    //             this._colliding.collisionDirection = collision[1];
-    //             this.stopMovement(collision[1]);
-    //         } else {
-    //             this._fillColor = this._baseFillColor;
-    //             this._colliding.collision = false;
-    //         }
-    //     };
-    // }
+    #addMovement(direction = null) {
+        if (!direction) return;
 
-    changeDirection(direction, val = false) {
-        this._direction = direction;
-        if (Object.keys(this._directionMap).includes(direction)) {
-            this._directionMap[direction] = val;
+        if (this.#getIndex(direction) > 0) {
+            let currentIndex = this.#getIndex(direction);
+            this.#movementQueue = this.#movementQueue.splice(currentIndex, 1);
+            this.#movementQueue.unshift(direction);
+        } else if (this.#getIndex(direction) < 0) {
+            this.#movementQueue.unshift(direction);
         }
+    }
+
+    #removeMovement(direction = null) {
+        if (!direction || this.#getIndex(direction) < 0) return;
+        let index = this.#getIndex(direction);
+        this.#movementQueue.splice(index, 1);
+    }
+
+    #getIndex(direction = '') {
+        return this.#movementQueue.indexOf(direction);
+    }
+
+    #shouldMove() {
+        return Boolean(this.#movementQueue[0]);
     }
 }

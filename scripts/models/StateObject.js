@@ -2,20 +2,20 @@ import MathUtil from "../util/MathUtil.js";
 import Util from "../util/Util.js";
 
 export default class StateObject {
-    _id;
-    _x;
-    _y;
-    _width;
-    _height;
-    _speed;
-    _fillColor;
-    _baseFillColor;
-    _direction;
-    _colliding = {
+    #id;
+    #x;
+    #y;
+    #width;
+    #height;
+    #speed;
+    #fillColor;
+    #baseFillColor;
+    #direction;
+    #colliding = {
         collisionDirection: '',
         collision: false,
     };
-    _directionMap = {
+    #directionMap = {
         'left': false,
         'right': false,
         'up': false,
@@ -23,30 +23,30 @@ export default class StateObject {
     }
 
     constructor(x = 0, y = 0, width = 0, height = 0, speed = 0, fillColor = 'black') {
-        this._id = crypto.randomUUID();
-        this._x = x;
-        this._y = y;
-        this._width = width;
-        this._height = height;
-        this._speed = speed;
-        this._fillColor = fillColor;
-        this._baseFillColor = this._fillColor;
-        this._direction = '';
+        this.#id = crypto.randomUUID();
+        this.#x = x;
+        this.#y = y;
+        this.#width = width;
+        this.#height = height;
+        this.#speed = speed;
+        this.#fillColor = fillColor;
+        this.#baseFillColor = this.#fillColor;
+        this.#direction = '';
     }
 
     moveLinear(direction, timePassed, duration) {
         switch(direction) {
             case 'up':
-                this._x = MathUtil.easeLinear(timePassed, this._x, this._x - this._speed, duration);
+                this.#x = MathUtil.easeLinear(timePassed, this.#x, this.#x - this.#speed, duration);
                 break;
             case 'down':
-                this._x = MathUtil.easeLinear(timePassed, this._x, this._x + this._speed, duration);
+                this.#x = MathUtil.easeLinear(timePassed, this.#x, this.#x + this.#speed, duration);
                 break;
             case 'left':
-                this._y = MathUtil.easeLinear(timePassed, this._y, this._y - this._speed, duration);
+                this.#y = MathUtil.easeLinear(timePassed, this.#y, this.#y - this.#speed, duration);
                 break;
             case 'right':
-                this._y = MathUtil.easeLinear(timePassed, this._y, this._y + this._speed, duration);
+                this.#y = MathUtil.easeLinear(timePassed, this.#y, this.#y + this.#speed, duration);
                 break;
             default:
                 break;
@@ -56,16 +56,16 @@ export default class StateObject {
     moveQuint(direction, timePassed, duration) {
         switch(direction) {
             case 'up':
-                this._x = MathUtil.easeInOutQuint(timePassed, this._x, this._x - this._speed, duration);
+                this.#x = MathUtil.easeInOutQuint(timePassed, this.#x, this.#x - this.#speed, duration);
                 break;
             case 'down':
-                this._x = MathUtil.easeInOutQuint(timePassed, this._x, this._x + this._speed, duration);
+                this.#x = MathUtil.easeInOutQuint(timePassed, this.#x, this.#x + this.#speed, duration);
                 break;
             case 'left':
-                this._y = MathUtil.easeInOutQuint(timePassed, this._y, this._y - this._speed, duration);
+                this.#y = MathUtil.easeInOutQuint(timePassed, this.#y, this.#y - this.#speed, duration);
                 break;
             case 'right':
-                this._y = MathUtil.easeInOutQuint(timePassed, this._y, this._y + this._speed, duration);
+                this.#y = MathUtil.easeInOutQuint(timePassed, this.#y, this.#y + this.#speed, duration);
                 break;
             default:
                 break;
@@ -73,139 +73,149 @@ export default class StateObject {
     }
 
     move(direction, secondsPassed) {
-        this._direction = direction;
+        this.#direction = direction;
         switch(direction) {
             case 'up':
-                if (this._colliding.collisionDirection != direction)
-                this._y -= this._speed * secondsPassed;
+                this.#y -= this.#speed * secondsPassed;
                 break;
             case 'down':
-                this._y += this._speed * secondsPassed;
+                this.#y += this.#speed * secondsPassed;
                 break;
             case 'left':
-                this._x -= this._speed * secondsPassed;
+                this.#x -= this.#speed * secondsPassed;
                 break;
             case 'right':
-                this._x += this._speed * secondsPassed;
+                this.#x += this.#speed * secondsPassed;
                 break;
             default:
                 break;
         }
     }
 
-    changeDirection(direction) {
-        this._direction = direction;
-        for (let key of Object.keys(this._directionMap)) {
-            if (key === direction) {
-                this._directionMap[key] = true;
-            } else {
-                this._directionMap[key] = false;
+    changeDirection(direction = '', override = false) {
+        this.#direction = direction;
+        if (override) {
+            for (let key of Object.keys(this.#directionMap)) {
+                if (key === direction && direction != this.#colliding.collisionDirection) {
+                    this.#directionMap[key] = true;
+                } else {
+                    this.#directionMap[key] = false;
+                }
+            }
+        } else {
+            for (let key of Object.keys(this.#directionMap)) {
+                if (key === direction && direction != this.#colliding.collisionDirection) {
+                    this.#directionMap[key] = true;
+                }
             }
         }
     }
 
+    clearDirection(direction = '') {
+        this.changeDirection('', false);
+        this.#directionMap[direction] = false;
+    }
+
     detectCollision(objects) {
-        let positionList = Util.buildXYList(objects, this._id);
+        let positionList = Util.buildXYList(objects, this.#id);
         for (let position of positionList) {
             const collision = Util.isColliding(this, position);
             if (collision[0]) {
-                this._fillColor = 'red';
-                this._colliding.collision = true;
-                if (collision[2]) {
-                    this._colliding.collisionDirection = Util.getOppositeDirection(collision[2]);
-                } else {
-                    this._colliding.collisionDirection = this._direction;
-                }
+                this.#fillColor = 'red';
+                this.#colliding.collision = true;
+                this.#colliding.collisionDirection = collision[1];
             } else {
-                this._fillColor = this._baseFillColor;
-                this._colliding.collision = false;
-                this._colliding.collisionDirection = '';
+                this.#fillColor = this.#baseFillColor;
+                this.#colliding.collision = false;
+                this.#colliding.collisionDirection = '';
             }
         };
     }
 
     draw(ctx) {
-        ctx.fillStyle = this._fillColor;
-        ctx.fillRect(this._x, this._y, this._width, this._height);
+        ctx.fillStyle = this.#fillColor;
+        ctx.fillRect(this.#x, this.#y, this.#width, this.#height);
     }
 
     update(secondsPassed, collisionObjects) {
-        this.detectCollision(collisionObjects);
-        if (this._direction === 'left' && this._colliding.collisionDirection != 'left') {
-            this.move('left', secondsPassed);
+        if (collisionObjects) {
+            this.detectCollision(collisionObjects);
         }
-        if (this._direction === 'right' && this._colliding.collisionDirection != 'right') {
-            this.move('right', secondsPassed);
-        }
-        if (this._direction === 'up' && this._colliding.collisionDirection != 'up') {
-            this.move('up', secondsPassed);
-        }
-        if (this._direction === 'down' && this._colliding.collisionDirection != 'down') {
-            this.move('down', secondsPassed);
+
+        if (this.#direction != this.#colliding.collisionDirection) {
+            this.move(this.#direction, secondsPassed);
         }
     }
 
     get direction() {
-        return this._direction;
+        return this.#direction;
     }
 
     get id() {
-        return this._id;
+        return this.#id;
     }
 
     get x() {
-        return this._x;
+        return this.#x;
     }
 
     get y() {
-        return this._y;
+        return this.#y;
     }
 
     get width() {
-        return this._width;
+        return this.#width;
     }
 
     get height() {
-        return this._height;
+        return this.#height;
     }
 
     get speed() {
-        return this._speed;
+        return this.#speed;
     }
     
     get fillColor() {
-        return this._fillColor;
+        return this.#fillColor;
+    }
+
+    get directionMap() {
+        return this.#directionMap;
+    }
+
+    get colliding() {
+        return this.#colliding;
     }
 
     set id(id) {
-        this._id = id;
+        this.#id = id;
     }
 
     set x(x) {
-        this._x = x;
+        this.#x = x;
     }
 
     set y(y) {
-        this._y = y;
+        this.#y = y;
     }
 
     set width(width) {
-        this._width = width;
+        this.#width = width;
     }
 
     set height(height) {
-        this.height = height;
+        this.#height = height;
     }
 
     set speed(speed) {
-        this._speed = speed;
+        this.#speed = speed;
     }
 
     set fillColor(fillColor) {
-        this._fillColor = fillColor;
+        this.#fillColor = fillColor;
     }
 
     set direction(direction) {
-        this._direction = direction;
+        this.#direction = direction;
     }
 }
