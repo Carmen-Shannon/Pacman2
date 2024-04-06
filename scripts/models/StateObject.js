@@ -76,16 +76,16 @@ export default class StateObject {
         this.#direction = direction;
         switch(direction) {
             case 'up':
-                this.#y -= this.#speed * secondsPassed;
+                this.#y -= Math.round(this.#speed * secondsPassed);
                 break;
             case 'down':
-                this.#y += this.#speed * secondsPassed;
+                this.#y += Math.round(this.#speed * secondsPassed);
                 break;
             case 'left':
-                this.#x -= this.#speed * secondsPassed;
+                this.#x -= Math.round(this.#speed * secondsPassed);
                 break;
             case 'right':
-                this.#x += this.#speed * secondsPassed;
+                this.#x += Math.round(this.#speed * secondsPassed);
                 break;
             default:
                 break;

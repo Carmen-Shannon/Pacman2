@@ -17,48 +17,17 @@ export default class Util {
         if (object2.x > object1.width + object1.x || object1.x > object2.width + object2.x || object2.y > object1.height + object1.y || object1.y > object2.height + object2.y) {
             return [false, null];
         }
-        // if (object1.x + object1.width >= object2.x && object1.y + object1.height === object2.y) {
-        //     console.log('rightcollision')
-        //     return [true, 'right'];
-        // }
-        // if (object2.x + object2.width >= object1.x) {
-        //     console.log('leftcollision');
-        //     return [true, 'left'];
-        // }
-        // if (object1.y + object1.height >= object2.y) {
-        //     console.log('upcollision');
-        //     return [true, 'up'];
-        // }
-        // if (object2.y + object2.height >= object1.y) {
-        //     console.log('downcollision')
-        //     return [true, 'down']
-        // }
-
-        console.log(object1.x, object1.y, object2.x, object2.y);
-
-        if (object1.y + object1.height >= object2.y && object1.y < object2.y && this.#withinBounds(object1, object2, 'up')) {
-            console.log('upcollision')
+        if (object1.y === object2.y + object2.height) {
             return [true, 'up'];
         }
-        if (object1.x + object1.width >= object2.x && object1.x < object2.x && this.#withinBounds(object1, object2, 'right')) {
-            console.log('rightcollision')
-            return [true, 'right'];
+        if (object1.y + object1.height === object2.y) {
+            return [true, 'down'];
         }
-        if (object2.x + object2.width >= object1.x && object2.x < object1.x && this.#withinBounds(object1, object2, 'left')) {
-            console.log('leftcollision')
+        if (object1.x === object2.x + object2.width) {
             return [true, 'left'];
         }
-        return [false, null];
-    }
-
-    static #withinBounds(object1, object2, direction) {
-        switch (direction) {
-            case 'left':
-            case 'right':
-                return (object1.y >= object2.y - object2.height && object1.y <= object2.y + object2.height);
-            case 'down':
-            case 'up':
-                return (object1.x >= object2.x - object2.width && object1.x <= object2.x + object2.width);
+        if (object1.x + object1.width === object2.x) {
+            return [true, 'right'];
         }
     }
 
