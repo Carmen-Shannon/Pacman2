@@ -21,10 +21,6 @@ export default class Game {
     }
 
     init() {
-        // let canvas = document.getElementById('gamewindow');
-        // let ctx = canvas.getContext('2d');
-        // this.#canvasConfig.init(canvas, ctx);
-
         let player = this.#getPlayerObject();
 
         WindowEvents.resize(this.#canvasConfig.canvas);
@@ -77,7 +73,6 @@ export default class Game {
         for (let obj of this.#stateObjects) {
             if (obj instanceof PlayerObject) return obj;
         }
-        return null;
     }
 
     #getGhostList() {

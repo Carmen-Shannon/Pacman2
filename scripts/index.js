@@ -4,11 +4,11 @@ import Game from "./game/Game.js";
 
 // set up config and game objects
 const canvasConfig = new CanvasConfig();
-const player = new PlayerObject(100, 100, 100);
+const player = new PlayerObject(50, 50, 50);
 const fpsDisplay = new FPSObject();
 const fpsConfig = new FPSConfig(60);
 const ghosts = [
-    new GhostObject(250, 250, 100, 100, 0, 'black')
+    new GhostObject(250, 250, 50, 50, 20, 'black')
 ];
 
 // set up main game process

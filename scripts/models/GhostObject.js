@@ -2,7 +2,7 @@ import StateObject from "./StateObject.js";
 import Util from "../util/Util.js";
 
 export default class GhostObject extends StateObject {
-    constructor(x = 0, y = 0, width = 0, height = 0, speed = 100, fillColor = 'black') {
+    constructor(x = 0, y = 0, width = 0, height = 0, speed = 0, fillColor = 'black') {
         super(x, y, width, height, speed, fillColor);
         this.pickRandomDirection();
     }
@@ -16,7 +16,7 @@ export default class GhostObject extends StateObject {
 
     oppositeDirection(direction) {
         if (direction) {
-            this.changeDirection(Util.getOppositeDirection(direction));
+            this.changeDirection(Util.getOppositeDirection(direction), true);
         }
     }
 

@@ -17,18 +17,23 @@ export default class Util {
         if (object2.x > object1.width + object1.x || object1.x > object2.width + object2.x || object2.y > object1.height + object1.y || object1.y > object2.height + object2.y) {
             return [false, null];
         }
-        if (object1.y === object2.y + object2.height) {
+        const object1x = Math.round(object1.x);
+        const object1y = Math.round(object1.y);
+        const object2x = Math.round(object2.x);
+        const object2y = Math.round(object2.y);
+        if (object1y >= (object2y + object2.height) - 2 && object1y <= (object2y + object2.height) + 2) {
             return [true, 'up'];
         }
-        if (object1.y + object1.height === object2.y) {
+        if (object2y >= (object1y + object1.height) - 2 && object2y <= (object1y + object1.height) + 2) {
             return [true, 'down'];
         }
-        if (object1.x === object2.x + object2.width) {
+        if (object1x >= (object2x + object2.width) - 2 && object1x <= (object2x + object2.width) + 2) {
             return [true, 'left'];
         }
-        if (object1.x + object1.width === object2.x) {
+        if (object2x >= (object1x + object1.width) - 2 && object2x <= (object1x + object1.width) + 2) {
             return [true, 'right'];
         }
+        return [true, ''];
     }
 
     static getOppositeDirection(direction) {
