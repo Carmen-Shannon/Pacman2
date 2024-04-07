@@ -29,9 +29,16 @@ export default class Game {
 
     init() {
         let player = this.#getPlayerObject();
+        let ghosts = this.#getGhostList();
 
         WindowEvents.resize(this.#canvasConfig.canvas);
         this.#regenerateWallObjects();
+
+        let ghostDirectionTimer = window.setInterval(() => {
+            for (let ghost of ghosts) {
+                ghost.pickRandomDirection();
+            }
+        }, 2000);
 
         window.addEventListener('keydown', (event) => {
             KeyEvents.keyDown(event, player);
@@ -54,6 +61,9 @@ export default class Game {
             this.#update(this.#fpsConfig.secondsPassed);
             this.#draw();
         }
+        if (this.#fpsConfig.shouldAnimate()) {
+
+        }
         window.requestAnimationFrame(this.#run.bind(this));
     }
 
@@ -63,7 +73,10 @@ export default class Game {
         let walls = this.#getWallObjects();
         this.#fpsDisplay.update(secondsPassed);
         for (let ghost of ghosts) {
-            ghost.update(secondsPassed, [player, ...walls]);
+            let otherGhosts = ghosts.filter((g) => {
+                return g.id != ghost.id
+            })
+            ghost.update(secondsPassed, [...otherGhosts, player, ...walls]);
         }
         player.update(secondsPassed, [...ghosts, ...walls]);
     }

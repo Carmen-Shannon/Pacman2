@@ -8,7 +8,10 @@ const player = new PlayerObject(50, 50, 50);
 const fpsDisplay = new FPSObject();
 const fpsConfig = new FPSConfig(60);
 const ghosts = [
-    new GhostObject(250, 250, 50, 50, 0, 'black')
+    new GhostObject(250, 250, 50, 50, 75, 'black'),
+    new GhostObject(350, 250, 50, 50, 75, 'orange'),
+    new GhostObject(450, 250, 50, 50, 75, 'purple'),
+    new GhostObject(550, 250, 50, 50, 75, 'green')
 ];
 const walls = WallObject.generateWalls(canvasConfig);
 

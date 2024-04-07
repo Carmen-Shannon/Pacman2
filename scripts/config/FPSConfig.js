@@ -44,6 +44,10 @@ export default class FPSConfig {
         return this.#delta > this.#interval;
     }
 
+    shouldAnimate() {
+        return this.#delta > this.#interval * 5
+    }
+
     get then() {
         return this.#then;
     }
