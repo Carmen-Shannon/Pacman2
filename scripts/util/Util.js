@@ -2,14 +2,14 @@ export default class Util {
     static buildXYList(stateObjects, id) {
         if (!id) {
             return stateObjects.map((obj) => {
-                return {x: obj.x, y: obj.y, width: obj.width, height: obj.height, direction: obj.direction};
+                return {x: obj.x, y: obj.y, width: obj.width, height: obj.height};
             });
         }
         return stateObjects.map((obj) => {
             if (obj.id === id) {
                 return;
             }
-            return {x: obj.x, y: obj.y, width: obj.width, height: obj.height, direction: obj.direction};
+            return {x: obj.x, y: obj.y, width: obj.width, height: obj.height};
         });
     }
     
