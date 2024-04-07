@@ -14,26 +14,42 @@ export default class Util {
     }
     
     static isColliding(object1, object2) {
-        if (object2.x > object1.width + object1.x || object1.x > object2.width + object2.x || object2.y > object1.height + object1.y || object1.y > object2.height + object2.y) {
-            return [false, null];
+        const collisionMap = {
+            'up': false,
+            'down': false,
+            'left': false,
+            'right': false
         }
+        let isColliding = false;
         const object1x = Math.round(object1.x);
         const object1y = Math.round(object1.y);
         const object2x = Math.round(object2.x);
         const object2y = Math.round(object2.y);
+
+        if (object2x > object1.width + object1x || object1x > object2.width + object2x || object2y > object1.height + object1y || object1y > object2.height + object2y) {
+            return [isColliding, collisionMap];
+        }
         if (object1y >= (object2y + object2.height) - 2 && object1y <= (object2y + object2.height) + 2) {
+            isColliding = true;
+            collisionMap['up'] = true;
             return [true, 'up'];
         }
         if (object2y >= (object1y + object1.height) - 2 && object2y <= (object1y + object1.height) + 2) {
+            isColliding = true;
+            collisionMap['down'] = true;
             return [true, 'down'];
         }
         if (object1x >= (object2x + object2.width) - 2 && object1x <= (object2x + object2.width) + 2) {
+            isColliding = true;
+            collisionMap['left'] = true;
             return [true, 'left'];
         }
         if (object2x >= (object1x + object1.width) - 2 && object2x <= (object1x + object1.width) + 2) {
+            isColliding = true;
+            collisionMap['right'] = true;
             return [true, 'right'];
         }
-        return [true, ''];
+        return [isColliding, collisionMap];
     }
 
     static getOppositeDirection(direction) {

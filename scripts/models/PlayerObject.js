@@ -10,7 +10,7 @@ export default class PlayerObject extends StateObject {
     }
 
     constructor(width = 0, height = 0, speed = 0) {
-        super(0, 0, width, height, speed, 'yellow');
+        super(200, 200, width, height, speed, 'yellow');
         this.#movementQueue = [];
     }
 
@@ -24,7 +24,7 @@ export default class PlayerObject extends StateObject {
 
     keyDown(keyCode = '') {
         let direction = this.getKeyMapValue(keyCode);
-        if (this.colliding.collisionDirection != direction) {
+        if (!this.colliding.collisionMap[direction]) {
             this.#addMovement(direction);
             this.changeDirection(direction, false);
         }

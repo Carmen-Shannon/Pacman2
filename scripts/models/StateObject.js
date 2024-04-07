@@ -12,8 +12,8 @@ export default class StateObject {
     #baseFillColor;
     #direction;
     #colliding = {
-        collisionDirection: '',
         collision: false,
+        collisionMap: {},
     };
     #directionMap = {
         'left': false,
@@ -95,7 +95,7 @@ export default class StateObject {
         this.#direction = direction;
         if (override) {
             for (let key of Object.keys(this.#directionMap)) {
-                if (key === direction && direction != this.#colliding.collisionDirection) {
+                if (key === direction && !this.#colliding.collisionMap[direction]) {
                     this.#directionMap[key] = true;
                 } else {
                     this.#directionMap[key] = false;
@@ -103,7 +103,7 @@ export default class StateObject {
             }
         } else {
             for (let key of Object.keys(this.#directionMap)) {
-                if (key === direction && direction != this.#colliding.collisionDirection) {
+                if (key === direction && !this.#colliding.collisionMap[direction]) {
                     this.#directionMap[key] = true;
                 }
             }
@@ -117,18 +117,23 @@ export default class StateObject {
 
     detectCollision(objects) {
         let positionList = Util.buildXYList(objects, this.#id);
+        let collisionCheck = false;
+        const collisionMap = {
+            'up': false,
+            'down': false,
+            'left': false,
+            'right': false
+        }
         for (let position of positionList) {
             const collision = Util.isColliding(this, position);
             if (collision[0]) {
-                this.#fillColor = 'red';
-                this.#colliding.collision = true;
-                this.#colliding.collisionDirection = collision[1];
-            } else {
-                this.#fillColor = this.#baseFillColor;
-                this.#colliding.collision = false;
-                this.#colliding.collisionDirection = '';
+                collisionCheck = true;
+                collisionMap[collision[1]] = true;
             }
         };
+        this.#colliding.collision = collisionCheck;
+        this.#fillColor = collisionCheck ? 'red' : this.#baseFillColor;
+        this.#colliding.collisionMap = Object.values(collisionMap).includes(true) ? collisionMap : {};
     }
 
     draw(ctx) {
@@ -141,7 +146,7 @@ export default class StateObject {
             this.detectCollision(collisionObjects);
         }
 
-        if (this.#direction != this.#colliding.collisionDirection) {
+        if (!this.#colliding.collisionMap[this.#direction]) {
             this.move(this.#direction, secondsPassed);
         }
     }
