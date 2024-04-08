@@ -4,14 +4,14 @@ import Game from "./game/Game.js";
 
 // set up config and game objects
 const canvasConfig = new CanvasConfig();
-const player = new PlayerObject(50, 50, 50);
+const player = new PlayerObject(100, 100, 50);
 const fpsDisplay = new FPSObject();
 const fpsConfig = new FPSConfig(60);
 const ghosts = [
-    new GhostObject(250, 250, 50, 50, 75, 'black'),
-    new GhostObject(350, 250, 50, 50, 75, 'orange'),
-    new GhostObject(450, 250, 50, 50, 75, 'purple'),
-    new GhostObject(550, 250, 50, 50, 75, 'green')
+    new GhostObject(250, 250, 100, 100, 50, 'black'),
+    new GhostObject(350, 250, 100, 100, 50, 'orange'),
+    new GhostObject(450, 250, 100, 100, 50, 'purple'),
+    new GhostObject(550, 250, 100, 100, 50, 'green')
 ];
 const walls = WallObject.generateWalls(canvasConfig);
 

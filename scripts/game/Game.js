@@ -28,6 +28,7 @@ export default class Game {
     }
 
     init() {
+        this.#canvasConfig.ctx.imageSmoothingQuality = 'high';
         let player = this.#getPlayerObject();
         let ghosts = this.#getGhostList();
 
@@ -38,7 +39,7 @@ export default class Game {
             for (let ghost of ghosts) {
                 ghost.pickRandomDirection();
             }
-        }, 2000);
+        }, 5000);
 
         window.addEventListener('keydown', (event) => {
             KeyEvents.keyDown(event, player);
@@ -56,13 +57,19 @@ export default class Game {
 
     #run(tick = 0) {
         this.#fpsConfig.tick(tick);
+        this.#fpsConfig.stepAnimationTimer();
         if (this.#fpsConfig.shouldUpdate()) {
             this.#fpsConfig.updateThen();
             this.#update(this.#fpsConfig.secondsPassed);
             this.#draw();
         }
         if (this.#fpsConfig.shouldAnimate()) {
-
+            let player = this.#getPlayerObject();
+            let ghosts = this.#getGhostList();
+            player.stepAnimation();
+            for (let ghost of ghosts) {
+                ghost.stepAnimation();
+            }
         }
         window.requestAnimationFrame(this.#run.bind(this));
     }
@@ -92,7 +99,7 @@ export default class Game {
         for (let ghost of ghosts) {
             ghost.draw(this.#canvasConfig.ctx);
         }
-        player?.draw(this.#canvasConfig.ctx);
+        player.draw(this.#canvasConfig.ctx);
         this.#fpsDisplay.draw(this.#canvasConfig.ctx);
     }
 

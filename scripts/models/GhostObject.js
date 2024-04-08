@@ -3,7 +3,7 @@ import Util from "../util/Util.js";
 
 export default class GhostObject extends StateObject {
     constructor(x = 0, y = 0, width = 0, height = 0, speed = 0, fillColor = 'black') {
-        super(x, y, width, height, speed, fillColor);
+        super(x, y, width, height, speed, fillColor, '../assets/ghost.png');
         this.pickRandomDirection();
     }
 
@@ -12,6 +12,7 @@ export default class GhostObject extends StateObject {
         let randomIndex = Math.floor(Math.random() * choices.length);
         let choice = choices[randomIndex];
         this.changeDirection(choice);
+        this.updateLastDirection(choice);
     }
 
     oppositeDirection(direction) {

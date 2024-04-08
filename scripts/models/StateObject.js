@@ -1,5 +1,6 @@
 import MathUtil from "../util/MathUtil.js";
 import Util from "../util/Util.js";
+import CanvasConfig from "../config/CanvasConfig.js";
 
 export default class StateObject {
     #id;
@@ -11,6 +12,7 @@ export default class StateObject {
     #fillColor;
     #baseFillColor;
     #direction;
+    #lastDirection = '';
     #colliding = {
         collision: false,
         collisionMap: {},
@@ -21,8 +23,19 @@ export default class StateObject {
         'up': false,
         'down': false
     }
+    #spriteSheet = {
+        image: new Image(),
+        width: 150,
+        height: 150,
+        scale: 3,
+        scaledWidth: 100,
+        scaledHeight: 100,
+        cycleLoop: [0, 1, 2, 3, 4, 5, 6, 7],
+    };
+    #animationStep = 0;
+    #audio = new Audio();
 
-    constructor(x = 0, y = 0, width = 0, height = 0, speed = 0, fillColor = 'black') {
+    constructor(x = 0, y = 0, width = 0, height = 0, speed = 0, fillColor = 'black', spriteSheetPath = '') {
         this.#id = crypto.randomUUID();
         this.#x = x;
         this.#y = y;
@@ -32,6 +45,12 @@ export default class StateObject {
         this.#fillColor = fillColor;
         this.#baseFillColor = this.#fillColor;
         this.#direction = '';
+        this.#audio = new Audio();
+        this.#audio.volume = 0.20;
+
+        let spriteSheet = new Image();
+        spriteSheet.src = spriteSheetPath;
+        this.#spriteSheet.image = spriteSheet;
     }
 
     moveLinear(direction, timePassed, duration) {
@@ -134,11 +153,17 @@ export default class StateObject {
         this.#colliding.collision = collisionCheck;
         this.#fillColor = collisionCheck ? 'red' : this.#baseFillColor;
         this.#colliding.collisionMap = Object.values(collisionMap).includes(true) ? collisionMap : {};
+        // if (collisionCheck) {
+        //     if (this.#audio.paused) {
+        //         this.#playAudio();
+        //     }
+        // }
     }
 
     draw(ctx) {
-        ctx.fillStyle = this.#fillColor;
-        ctx.fillRect(this.#x, this.#y, this.#width, this.#height);
+        let frameX = this.#spriteSheet.cycleLoop[this.#animationStep]
+        let frameY = this.#animationDirection(this.#lastDirection);
+        this.#drawFrame(frameX, frameY, ctx);
     }
 
     update(secondsPassed, collisionObjects) {
@@ -148,6 +173,46 @@ export default class StateObject {
 
         if (!this.#colliding.collisionMap[this.#direction]) {
             this.move(this.#direction, secondsPassed);
+        }
+    }
+
+    updateLastDirection(direction) {
+        this.#lastDirection = direction;
+    }
+
+    #animationDirection(lastDirection) {
+        let directionMap = {
+            'right': 0,
+            'left': 1,
+            'up': 2,
+            'down': 3
+        };
+        if (lastDirection && lastDirection.length === 0) {
+            return directionMap[this.#direction];
+        }
+
+        return directionMap[lastDirection];
+    }
+
+    #drawFrame(frameX = 0, frameY = 0, ctx = new CanvasConfig().ctx) {
+        ctx.drawImage(this.#spriteSheet.image, frameX * this.#spriteSheet.width, frameY * this.#spriteSheet.height, this.#spriteSheet.width, this.#spriteSheet.height, this.x, this.y, this.#spriteSheet.scaledWidth, this.#spriteSheet.scaledHeight);
+    }
+
+    #playAudio() {
+        let rand = Math.round(Math.random());
+        if (rand) {
+            this.#audio.src = '../assets/jcwomp.mp3';
+        } else {
+            this.#audio.src = '../assets/jcyeah.mp3';
+        }
+        this.#audio.play();
+    }
+
+    stepAnimation() {
+        if (this.#animationStep > this.#spriteSheet.cycleLoop.length - 1) {
+            this.#animationStep = 0;
+        } else {
+            this.#animationStep += 1;
         }
     }
 
@@ -189,6 +254,10 @@ export default class StateObject {
 
     get colliding() {
         return this.#colliding;
+    }
+
+    get spriteSheet() {
+        return this.#spriteSheet;
     }
 
     set id(id) {

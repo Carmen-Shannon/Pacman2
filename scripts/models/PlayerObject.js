@@ -10,7 +10,7 @@ export default class PlayerObject extends StateObject {
     }
 
     constructor(width = 0, height = 0, speed = 0) {
-        super(200, 200, width, height, speed, 'yellow');
+        super(200, 200, width, height, speed, 'yellow', '../assets/player.png');
         this.#movementQueue = [];
     }
 
@@ -24,6 +24,7 @@ export default class PlayerObject extends StateObject {
 
     keyDown(keyCode = '') {
         let direction = this.getKeyMapValue(keyCode);
+        this.updateLastDirection(direction);
         if (!this.colliding.collisionMap[direction]) {
             this.#addMovement(direction);
             this.changeDirection(direction, false);
@@ -40,8 +41,10 @@ export default class PlayerObject extends StateObject {
         this.#removeMovement(direction);
         if (this.#shouldMove()) {
             this.changeDirection(this.#movementQueue[0], false);
+            this.updateLastDirection(this.#movementQueue[0]);
         } else {
             this.changeDirection('', false);
+            this.updateLastDirection(direction);
         }
     }
 

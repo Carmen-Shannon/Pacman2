@@ -4,6 +4,7 @@ export default class FPSConfig {
     #then;
     #now;
     #secondsPassed;
+    #animationTimer;
 
     constructor(fpsTarget = 60) {
         this.#delta = 0;
@@ -11,6 +12,7 @@ export default class FPSConfig {
         this.#then = 0;
         this.#now = 0;
         this.#secondsPassed = 0;
+        this.#animationTimer = 0;
     }
 
     tick(timestamp) {
@@ -45,7 +47,11 @@ export default class FPSConfig {
     }
 
     shouldAnimate() {
-        return this.#delta > this.#interval * 5
+        return this.#animationTimer / 12 === 5;
+    }
+
+    stepAnimationTimer() {
+        this.#animationTimer = this.#animationTimer >= 60 ? 0 : this.#animationTimer + 1; 
     }
 
     get then() {
